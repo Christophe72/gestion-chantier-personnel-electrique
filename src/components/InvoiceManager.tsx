@@ -173,177 +173,247 @@ export default function InvoiceManager() {
   };
 
   return (
-    <div className="font-sans min-h-screen p-8 pb-20">
-      <h2 className="text-xl font-bold mb-6">Gestion des factures</h2>
-      <form onSubmit={handleSubmit} className="mb-8 space-y-2">
-        <input
-          type="number"
-          name="amount"
-          placeholder="Montant"
-          value={form.amount}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="date"
-          name="issueDate"
-          placeholder="Date émission"
-          value={form.issueDate}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="date"
-          name="dueDate"
-          placeholder="Date échéance"
-          value={form.dueDate}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-          className="border p-2 rounded w-full"
+    <div className="font-sans min-h-screen p-4 md:p-8 bg-gray-50">
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center drop-shadow">
+          Gestion des factures
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="mb-10 bg-white shadow-lg rounded-xl p-6 space-y-4"
         >
-          <option value="Brouillon" className="text-black">
-            Brouillon
-          </option>
-          <option value="Envoyée" className="text-black">
-            Envoyée
-          </option>
-          <option value="Payée" className="text-black">
-            Payée
-          </option>
-          <option value="En retard" className="text-black">
-            En retard
-          </option>
-        </select>
-        <input
-          type="number"
-          name="interventionId"
-          placeholder="ID intervention"
-          value={form.interventionId}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Ajouter
-        </button>
-      </form>
-      {error && <div className="mb-4 text-red-600">{error}</div>}
-      {loading ? (
-        <p>Chargement...</p>
-      ) : (
-        <ul className="space-y-2">
-          {invoices.map((invoice) => (
-            <li key={invoice.id} className="border p-2 rounded">
-              {editId === invoice.id ? (
-                <form onSubmit={handleEditSubmit} className="space-y-2">
-                  <input
-                    type="number"
-                    name="amount"
-                    value={editForm.amount}
-                    onChange={handleEditChange}
-                    required
-                    className="border p-2 rounded w-full"
-                  />
-                  <input
-                    type="date"
-                    name="issueDate"
-                    value={editForm.issueDate}
-                    onChange={handleEditChange}
-                    required
-                    className="border p-2 rounded w-full"
-                  />
-                  <input
-                    type="date"
-                    name="dueDate"
-                    value={editForm.dueDate}
-                    onChange={handleEditChange}
-                    required
-                    className="border p-2 rounded w-full"
-                  />
-                  <select
-                    name="status"
-                    value={editForm.status}
-                    onChange={handleEditChange}
-                    className="border p-2 rounded w-full text-black"
-                  >
-                    <option value="Brouillon" className="text-black">
-                      Brouillon
-                    </option>
-                    <option value="Envoyée" className="text-black">
-                      Envoyée
-                    </option>
-                    <option value="Payée" className="text-black">
-                      Payée
-                    </option>
-                    <option value="En retard" className="text-black">
-                      En retard
-                    </option>
-                  </select>
-                  <input
-                    type="number"
-                    name="interventionId"
-                    value={editForm.interventionId}
-                    onChange={handleEditChange}
-                    required
-                    className="border p-2 rounded w-full"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-green-600 text-white px-4 py-2 rounded mr-2"
-                  >
-                    Valider
-                  </button>
-                  <button
-                    type="button"
-                    onClick={cancelEdit}
-                    className="bg-gray-400 text-white px-4 py-2 rounded"
-                  >
-                    Annuler
-                  </button>
-                </form>
-              ) : (
-                <>
-                  <strong>Montant :</strong> {invoice.amount} €<br />
-                  <strong>Émise le :</strong>{" "}
-                  {new Date(invoice.issueDate).toLocaleDateString()}
-                  <br />
-                  <strong>Échéance :</strong>{" "}
-                  {new Date(invoice.dueDate).toLocaleDateString()}
-                  <br />
-                  <strong>Statut :</strong> {invoice.status}
-                  <br />
-                  <strong>ID intervention :</strong> {invoice.interventionId}
-                  <div className="mt-2 flex gap-2">
-                    <button
-                      onClick={() => startEdit(invoice)}
-                      className="bg-yellow-500 text-white px-2 py-1 rounded"
-                    >
-                      Modifier
-                    </button>
-                    <button
-                      onClick={() => deleteInvoice(invoice.id)}
-                      className="bg-red-600 text-white px-2 py-1 rounded"
-                    >
-                      Supprimer
-                    </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                Montant *
+              </label>
+              <input
+                type="number"
+                name="amount"
+                placeholder="Montant"
+                value={form.amount}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                Date émission *
+              </label>
+              <input
+                type="date"
+                name="issueDate"
+                placeholder="Date émission"
+                value={form.issueDate}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                Date échéance *
+              </label>
+              <input
+                type="date"
+                name="dueDate"
+                placeholder="Date échéance"
+                value={form.dueDate}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                Statut
+              </label>
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+              >
+                <option value="Brouillon">Brouillon</option>
+                <option value="Envoyée">Envoyée</option>
+                <option value="Payée">Payée</option>
+                <option value="En retard">En retard</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                ID intervention *
+              </label>
+              <input
+                type="number"
+                name="interventionId"
+                placeholder="ID intervention"
+                value={form.interventionId}
+                onChange={handleChange}
+                required
+                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
+          >
+            Ajouter
+          </button>
+        </form>
+        {error && (
+          <div className="mb-4 text-red-600 text-center font-semibold">
+            {error}
+          </div>
+        )}
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <span className="animate-pulse text-blue-600 font-bold">
+              Chargement...
+            </span>
+          </div>
+        ) : (
+          <ul className="space-y-4">
+            {invoices.map((invoice) => (
+              <li
+                key={invoice.id}
+                className="bg-white shadow rounded-xl p-4 border border-gray-200"
+              >
+                {editId === invoice.id ? (
+                  <form onSubmit={handleEditSubmit} className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                          Montant *
+                        </label>
+                        <input
+                          type="number"
+                          name="amount"
+                          value={editForm.amount}
+                          onChange={handleEditChange}
+                          required
+                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                          Date émission *
+                        </label>
+                        <input
+                          type="date"
+                          name="issueDate"
+                          value={editForm.issueDate}
+                          onChange={handleEditChange}
+                          required
+                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                          Date échéance *
+                        </label>
+                        <input
+                          type="date"
+                          name="dueDate"
+                          value={editForm.dueDate}
+                          onChange={handleEditChange}
+                          required
+                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                          Statut
+                        </label>
+                        <select
+                          name="status"
+                          value={editForm.status}
+                          onChange={handleEditChange}
+                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+                        >
+                          <option value="Brouillon">Brouillon</option>
+                          <option value="Envoyée">Envoyée</option>
+                          <option value="Payée">Payée</option>
+                          <option value="En retard">En retard</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                          ID intervention *
+                        </label>
+                        <input
+                          type="number"
+                          name="interventionId"
+                          value={editForm.interventionId}
+                          onChange={handleEditChange}
+                          required
+                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="submit"
+                        className="bg-green-600 hover:bg-green-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                      >
+                        Valider
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        className="bg-gray-400 hover:bg-gray-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <span className="text-lg font-bold text-blue-700">
+                        Montant : {invoice.amount} €
+                      </span>
+                      <div className="text-gray-600 text-sm mt-1">
+                        <span>
+                          Émise le :{" "}
+                          {new Date(invoice.issueDate).toLocaleDateString()}
+                          <br />
+                        </span>
+                        <span>
+                          Échéance :{" "}
+                          {new Date(invoice.dueDate).toLocaleDateString()}
+                          <br />
+                        </span>
+                        <span>
+                          Statut : {invoice.status}
+                          <br />
+                        </span>
+                        <span>ID intervention : {invoice.interventionId}</span>
+                      </div>
+                    </div>
+                    <div className="mt-2 md:mt-0 flex gap-2">
+                      <button
+                        onClick={() => startEdit(invoice)}
+                        className="bg-yellow-400 hover:bg-yellow-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        onClick={() => deleteInvoice(invoice.id)}
+                        className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
                   </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
