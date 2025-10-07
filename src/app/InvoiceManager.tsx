@@ -117,11 +117,20 @@ export default function InvoiceManager() {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
+  const toISODate = (date: string) => {
+    // Si la date est déjà au format ISO, on la garde, sinon on la convertit
+    if (!date) return "";
+    if (date.length > 10) return date;
+    return new Date(date).toISOString();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addInvoice({
       ...form,
       amount: Number(form.amount),
+      issueDate: toISODate(form.issueDate),
+      dueDate: toISODate(form.dueDate),
       interventionId: Number(form.interventionId),
     });
     setForm({
@@ -151,6 +160,8 @@ export default function InvoiceManager() {
         id: editId,
         ...editForm,
         amount: Number(editForm.amount),
+        issueDate: toISODate(editForm.issueDate),
+        dueDate: toISODate(editForm.dueDate),
         interventionId: Number(editForm.interventionId),
       });
       setEditId(null);
@@ -198,10 +209,18 @@ export default function InvoiceManager() {
           onChange={handleChange}
           className="border p-2 rounded w-full"
         >
-          <option value="Brouillon">Brouillon</option>
-          <option value="Envoyée">Envoyée</option>
-          <option value="Payée">Payée</option>
-          <option value="En retard">En retard</option>
+          <option value="Brouillon" className="text-black">
+            Brouillon
+          </option>
+          <option value="Envoyée" className="text-black">
+            Envoyée
+          </option>
+          <option value="Payée" className="text-black">
+            Payée
+          </option>
+          <option value="En retard" className="text-black">
+            En retard
+          </option>
         </select>
         <input
           type="number"
@@ -256,12 +275,20 @@ export default function InvoiceManager() {
                     name="status"
                     value={editForm.status}
                     onChange={handleEditChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-black"
                   >
-                    <option value="Brouillon">Brouillon</option>
-                    <option value="Envoyée">Envoyée</option>
-                    <option value="Payée">Payée</option>
-                    <option value="En retard">En retard</option>
+                    <option value="Brouillon" className="text-black">
+                      Brouillon
+                    </option>
+                    <option value="Envoyée" className="text-black">
+                      Envoyée
+                    </option>
+                    <option value="Payée" className="text-black">
+                      Payée
+                    </option>
+                    <option value="En retard" className="text-black">
+                      En retard
+                    </option>
                   </select>
                   <input
                     type="number"

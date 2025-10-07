@@ -132,10 +132,17 @@ export default function InterventionManager() {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
+  const toISODate = (date: string) => {
+    if (!date) return "";
+    if (date.length > 10) return date;
+    return new Date(date).toISOString();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addIntervention({
       ...form,
+      date: toISODate(form.date),
       clientId: Number(form.clientId),
       electricianId: Number(form.electricianId),
     });
@@ -167,6 +174,7 @@ export default function InterventionManager() {
       updateIntervention({
         id: editId,
         ...editForm,
+        date: toISODate(editForm.date),
         clientId: Number(editForm.clientId),
         electricianId: Number(editForm.electricianId),
       });
