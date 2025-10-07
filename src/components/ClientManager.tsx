@@ -1,5 +1,4 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Client {
   id: number;
@@ -9,7 +8,7 @@ interface Client {
   email?: string;
 }
 
-const useClients = () => {
+export function useClients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -20,7 +19,7 @@ const useClients = () => {
       const res = await fetch("/api/clients");
       const data = await res.json();
       setClients(data);
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la récupération des clients");
     } finally {
       setLoading(false);
@@ -45,7 +44,7 @@ const useClients = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de l'ajout");
     }
   };
@@ -64,7 +63,7 @@ const useClients = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la modification");
     }
   };
@@ -83,13 +82,13 @@ const useClients = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la suppression");
     }
   };
 
   return { clients, loading, error, addClient, updateClient, deleteClient };
-};
+}
 
 export default function ClientManager() {
   const { clients, loading, error, addClient, updateClient, deleteClient } =

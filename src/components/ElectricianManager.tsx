@@ -6,7 +6,7 @@ interface Electrician {
   name: string;
 }
 
-const useElectricians = () => {
+export function useElectricians() {
   const [electricians, setElectricians] = useState<Electrician[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -17,7 +17,7 @@ const useElectricians = () => {
       const res = await fetch("/api/electricians");
       const data = await res.json();
       setElectricians(data);
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la récupération des électriciens");
     } finally {
       setLoading(false);
@@ -42,7 +42,7 @@ const useElectricians = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de l'ajout");
     }
   };
@@ -61,7 +61,7 @@ const useElectricians = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la modification");
     }
   };
@@ -80,7 +80,7 @@ const useElectricians = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la suppression");
     }
   };
@@ -93,7 +93,7 @@ const useElectricians = () => {
     updateElectrician,
     deleteElectrician,
   };
-};
+}
 
 export default function ElectricianManager() {
   const {

@@ -1,5 +1,6 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useClients } from "./ClientManager";
+import { useElectricians } from "./ElectricianManager";
 
 interface Intervention {
   id: number;
@@ -11,7 +12,7 @@ interface Intervention {
   electricianId: number;
 }
 
-const useInterventions = () => {
+export function useInterventions() {
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -22,7 +23,7 @@ const useInterventions = () => {
       const res = await fetch("/api/interventions");
       const data = await res.json();
       setInterventions(data);
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la récupération des interventions");
     } finally {
       setLoading(false);
@@ -47,7 +48,7 @@ const useInterventions = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de l'ajout");
     }
   };
@@ -66,7 +67,7 @@ const useInterventions = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la modification");
     }
   };
@@ -85,7 +86,7 @@ const useInterventions = () => {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
       }
-    } catch {
+    } catch (e) {
       setError("Erreur lors de la suppression");
     }
   };
@@ -98,7 +99,7 @@ const useInterventions = () => {
     updateIntervention,
     deleteIntervention,
   };
-};
+}
 
 export default function InterventionManager() {
   const {
@@ -109,13 +110,15 @@ export default function InterventionManager() {
     updateIntervention,
     deleteIntervention,
   } = useInterventions();
+  const { clients } = useClients();
+  const { electricians } = useElectricians();
   const [form, setForm] = useState<Omit<Intervention, "id">>({
     title: "",
     description: "",
     date: "",
     status: "Planifiée",
-    clientId: 0,
-    electricianId: 0,
+    clientId: clients.length > 0 ? clients[0].id : 0,
+    electricianId: electricians.length > 0 ? electricians[0].id : 0,
   });
   const [editId, setEditId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Omit<Intervention, "id">>(form);
@@ -227,24 +230,32 @@ export default function InterventionManager() {
           <option value="Terminée">Terminée</option>
           <option value="Facturée">Facturée</option>
         </select>
-        <input
-          type="number"
+        <select
           name="clientId"
-          placeholder="ID client"
           value={form.clientId}
           onChange={handleChange}
           required
           className="border p-2 rounded w-full"
-        />
-        <input
-          type="number"
+        >
+          {clients.map((client) => (
+            <option key={client.id} value={client.id}>
+              {client.name}
+            </option>
+          ))}
+        </select>
+        <select
           name="electricianId"
-          placeholder="ID électricien"
           value={form.electricianId}
           onChange={handleChange}
           required
           className="border p-2 rounded w-full"
-        />
+        >
+          {electricians.map((electrician) => (
+            <option key={electrician.id} value={electrician.id}>
+              {electrician.name}
+            </option>
+          ))}
+        </select>
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded"
@@ -295,22 +306,32 @@ export default function InterventionManager() {
                     <option value="Terminée">Terminée</option>
                     <option value="Facturée">Facturée</option>
                   </select>
-                  <input
-                    type="number"
+                  <select
                     name="clientId"
                     value={editForm.clientId}
                     onChange={handleEditChange}
                     required
                     className="border p-2 rounded w-full"
-                  />
-                  <input
-                    type="number"
+                  >
+                    {clients.map((client) => (
+                      <option key={client.id} value={client.id}>
+                        {client.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
                     name="electricianId"
                     value={editForm.electricianId}
                     onChange={handleEditChange}
                     required
                     className="border p-2 rounded w-full"
-                  />
+                  >
+                    {electricians.map((electrician) => (
+                      <option key={electrician.id} value={electrician.id}>
+                        {electrician.name}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     type="submit"
                     className="bg-green-600 text-white px-4 py-2 rounded mr-2"
