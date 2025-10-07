@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useInterventions } from "./InterventionManager";
 import Link from "next/link";
 
 interface Invoice {
@@ -96,6 +97,7 @@ const useInvoices = () => {
 export default function InvoiceManager() {
   const { invoices, loading, error, addInvoice, updateInvoice, deleteInvoice } =
     useInvoices();
+  const { interventions } = useInterventions();
   const [form, setForm] = useState<Omit<Invoice, "id">>({
     amount: 0,
     issueDate: "",
@@ -276,17 +278,26 @@ export default function InvoiceManager() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
-                ID intervention *
+                Intervention liée *
               </label>
-              <input
-                type="number"
+              <select
                 name="interventionId"
-                placeholder="ID intervention"
                 value={form.interventionId}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
+              >
+                {interventions.length === 0 && (
+                  <option value="" disabled>
+                    Aucune intervention disponible
+                  </option>
+                )}
+                {interventions.map((intervention) => (
+                  <option key={intervention.id} value={intervention.id}>
+                    {intervention.title} (ID {intervention.id})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <button
@@ -374,16 +385,29 @@ export default function InvoiceManager() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1 text-gray-700">
-                          ID intervention *
+                          Intervention liée *
                         </label>
-                        <input
-                          type="number"
+                        <select
                           name="interventionId"
                           value={editForm.interventionId}
                           onChange={handleEditChange}
                           required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400"
-                        />
+                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+                        >
+                          {interventions.length === 0 && (
+                            <option value="" disabled>
+                              Aucune intervention disponible
+                            </option>
+                          )}
+                          {interventions.map((intervention) => (
+                            <option
+                              key={intervention.id}
+                              value={intervention.id}
+                            >
+                              {intervention.title} (ID {intervention.id})
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div className="flex gap-2 mt-2">
