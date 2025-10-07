@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id           Int            @id @default(autoincrement())
+  name         String
+  address      String?
+  phone        String?
+  email        String?        @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  interventions Intervention[]
+}
+
+model Electrician {
+  id            Int            @id @default(autoincrement())
+  name          String
+  interventions Intervention[]
+}
+
+model Intervention {
+  id            Int         @id @default(autoincrement())
+  title         String
+  description   String?
+  date          DateTime
+  status        String      // Ex: "Planifiée", "En cours", "Terminée", "Facturée"
+  client        Client      @relation(fields: [clientId], references: [id])
+  clientId      Int
+  electrician   Electrician @relation(fields: [electricianId], references: [id])
+  electricianId Int
+  invoice       Invoice?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Invoice {
+  id             Int          @id @default(autoincrement())
+  amount         Float
+  issueDate      DateTime
+  dueDate        DateTime
+  status         String       // Ex: "Brouillon", "Envoyée", "Payée", "En retard"
+  intervention   Intervention @relation(fields: [interventionId], references: [id])
+  interventionId Int          @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
