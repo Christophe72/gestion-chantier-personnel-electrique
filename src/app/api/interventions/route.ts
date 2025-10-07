@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(_: NextRequest) {
+export async function GET() {
   try {
     const interventions = await prisma.intervention.findMany({
       include: { client: true, electrician: true, invoice: true },

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(_: NextRequest) {
+export async function GET() {
   try {
     const invoices = await prisma.invoice.findMany({
       include: { intervention: true },
