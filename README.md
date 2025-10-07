@@ -28,13 +28,19 @@ Application Next.js 15 (App Router) + Prisma + SQLite
 - `src/app/` : App Router Next.js 15
   - `api/[ressource]/route.ts` : routes API REST (GET, POST, PUT, DELETE)
   - `page.tsx` : frontend React CRUD (clients)
+- `src/components/` : composants React modulaires pour la gestion CRUD
+  - `ClientManager.tsx` : gestion des clients + hook `useClients`
+  - `ElectricianManager.tsx` : gestion des électriciens + hook `useElectricians`
+  - `InterventionManager.tsx` : gestion des interventions + hook `useInterventions` (dropdowns pour clés étrangères)
+  - `InvoiceManager.tsx` : gestion des factures + hook `useInvoices`
 - `prisma/` : schéma et seed de la base SQLite
 - `src/lib/prisma.ts` : instance Prisma mutualisée
 
 ## Fonctionnalités
 
 - **CRUD complet** sur clients, électriciens, interventions, factures
-- **Frontend React** : ajout, modification, suppression de clients (exemple)
+- **Composants React modulaires** pour chaque entité, avec hooks dédiés
+- **Dropdowns** pour sélectionner les clients et électriciens lors de la création d'une intervention (évite les erreurs de clé étrangère)
 - **API REST** : `/api/clients`, `/api/electricians`, `/api/interventions`, `/api/invoices`
 - **Base SQLite** persistante
 
@@ -63,7 +69,7 @@ fetch("/api/clients", {
 
 ## Pour aller plus loin
 
-- Adapter le frontend pour les autres entités
+- Adapter le frontend pour les autres entités (tous les managers sont prêts à être utilisés)
 - Ajouter des validations, des filtres, des exports
 - Déployer sur Vercel ou autre
 
