@@ -1,5 +1,5 @@
 "use client";
-import ElectricianManager from "../ElectricianManager";
+import ElectricianManager from "../../components/ElectricianManager";
 
 export default function ElectriciansPage() {
   return <ElectricianManager />;
