@@ -24,7 +24,7 @@ export function useInterventions() {
       const res = await fetch("/api/interventions");
       const data = await res.json();
       setInterventions(data);
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la récupération des interventions");
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ export function useInterventions() {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de l'ajout");
     }
   };
@@ -68,7 +68,7 @@ export function useInterventions() {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la modification");
     }
   };
@@ -87,7 +87,7 @@ export function useInterventions() {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la suppression");
     }
   };
