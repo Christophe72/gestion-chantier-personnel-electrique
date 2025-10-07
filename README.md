@@ -1,27 +1,36 @@
 # Gestion Chantier Personnel Électrique
 
+![Aperçu du dashboard](./public/dashboard.png)
+
 Application Next.js 15 (App Router) + Prisma + SQLite
 
 ## Installation
 
 1. **Cloner le projet**
 2. Installer les dépendances :
-   ```bash
-   npm install
-   ```
+
+```bash
+npm install
+```
+
 3. Initialiser Prisma et la base SQLite :
-   ```bash
-   npx prisma migrate dev --name init
-   npx prisma generate
-   ```
+
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
 4. Remplir la base avec des exemples :
-   ```bash
-   npx ts-node prisma/seed.ts
-   ```
+
+```bash
+npx ts-node prisma/seed.ts
+```
+
 5. Lancer le serveur :
-   ```bash
-   npm run dev
-   ```
+
+```bash
+npm run dev
+```
 
 ## Structure du projet
 

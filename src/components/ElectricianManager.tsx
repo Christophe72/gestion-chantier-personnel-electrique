@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Electrician {
   id: number;
@@ -141,6 +142,38 @@ export default function ElectricianManager() {
 
   return (
     <div className="font-sans min-h-screen p-4 md:p-8 bg-gray-50">
+      <nav className="flex justify-center gap-4 mb-8">
+        <Link
+          href="/"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold shadow transition"
+        >
+          Accueil
+        </Link>
+        <Link
+          href="/clients"
+          className="bg-blue-200 hover:bg-blue-300 text-blue-700 px-4 py-2 rounded-lg font-semibold shadow transition"
+        >
+          Clients
+        </Link>
+        <Link
+          href="/electricians"
+          className="bg-yellow-200 hover:bg-yellow-300 text-yellow-700 px-4 py-2 rounded-lg font-semibold shadow transition"
+        >
+          Électriciens
+        </Link>
+        <Link
+          href="/interventions"
+          className="bg-green-200 hover:bg-green-300 text-green-700 px-4 py-2 rounded-lg font-semibold shadow transition"
+        >
+          Interventions
+        </Link>
+        <Link
+          href="/invoices"
+          className="bg-purple-200 hover:bg-purple-300 text-purple-700 px-4 py-2 rounded-lg font-semibold shadow transition"
+        >
+          Factures
+        </Link>
+      </nav>
       <div className="max-w-2xl mx-auto">
         <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center drop-shadow">
           Gestion des électriciens
