@@ -39,9 +39,17 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
+    // Correction du format des dates
+    const updateData = { ...body };
+    if (updateData.issueDate && updateData.issueDate.length === 10) {
+      updateData.issueDate = new Date(updateData.issueDate).toISOString();
+    }
+    if (updateData.dueDate && updateData.dueDate.length === 10) {
+      updateData.dueDate = new Date(updateData.dueDate).toISOString();
+    }
     const invoice = await prisma.invoice.update({
       where: { id: body.id },
-      data: body,
+      data: updateData,
     });
     return Response.json(invoice);
   } catch (error) {

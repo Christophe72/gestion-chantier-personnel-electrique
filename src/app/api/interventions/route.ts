@@ -41,9 +41,14 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
+    // Correction du format de la date
+    const updateData = { ...body };
+    if (updateData.date && updateData.date.length === 10) {
+      updateData.date = new Date(updateData.date).toISOString();
+    }
     const intervention = await prisma.intervention.update({
       where: { id: body.id },
-      data: body,
+      data: updateData,
     });
     return Response.json(intervention);
   } catch (error) {

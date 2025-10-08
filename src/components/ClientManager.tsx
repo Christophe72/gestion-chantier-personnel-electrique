@@ -20,7 +20,7 @@ export function useClients() {
       const res = await fetch("/api/clients");
       const data = await res.json();
       setClients(data);
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la récupération des clients");
     } finally {
       setLoading(false);
@@ -45,7 +45,7 @@ export function useClients() {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de l'ajout");
     }
   };
@@ -64,7 +64,7 @@ export function useClients() {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la modification");
     }
   };
@@ -83,7 +83,7 @@ export function useClients() {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la suppression");
     }
   };
@@ -101,7 +101,12 @@ export default function ClientManager() {
     email: "",
   });
   const [editId, setEditId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<Omit<Client, "id">>(form);
+  const [editForm, setEditForm] = useState<Omit<Client, "id">>({
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -120,7 +125,7 @@ export default function ClientManager() {
   const startEdit = (client: Client) => {
     setEditId(client.id);
     setEditForm({
-      name: client.name || "",
+      name: client.name,
       address: client.address || "",
       phone: client.phone || "",
       email: client.email || "",
@@ -132,11 +137,13 @@ export default function ClientManager() {
     if (editId) {
       updateClient({ id: editId, ...editForm });
       setEditId(null);
+      setEditForm({ name: "", address: "", phone: "", email: "" });
     }
   };
 
   const cancelEdit = () => {
     setEditId(null);
+    setEditForm({ name: "", address: "", phone: "", email: "" });
   };
 
   return (
@@ -173,68 +180,66 @@ export default function ClientManager() {
           Factures
         </Link>
       </nav>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center drop-shadow">
-          Gestion des clients
-        </h2>
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <form
           onSubmit={handleSubmit}
-          className="mb-10 bg-white shadow-lg rounded-xl p-6 space-y-4"
+          className="bg-white shadow-lg rounded-xl p-6 space-y-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Nom *
-              </label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Nom"
-                value={form.name}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Adresse
-              </label>
-              <input
-                type="text"
-                name="address"
-                placeholder="Adresse"
-                value={form.address}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Téléphone
-              </label>
-              <input
-                type="text"
-                name="phone"
-                placeholder="Téléphone"
-                value={form.phone}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
+          <h2 className="text-2xl font-bold mb-4 text-blue-700 text-center">
+            Ajouter un client
+          </h2>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Nom *
+            </label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Nom"
+              value={form.name}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Adresse
+            </label>
+            <input
+              type="text"
+              name="address"
+              placeholder="Adresse"
+              value={form.address}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Téléphone
+            </label>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Téléphone"
+              value={form.phone}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+            />
           </div>
           <button
             type="submit"
@@ -243,133 +248,121 @@ export default function ClientManager() {
             Ajouter
           </button>
         </form>
-        {error && (
-          <div className="mb-4 text-red-600 text-center font-semibold">
-            {error}
-          </div>
-        )}
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <span className="animate-pulse text-blue-600 font-bold">
-              Chargement...
-            </span>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            {clients.map((client) => (
-              <li
-                key={client.id}
-                className="bg-white shadow rounded-xl p-4 border border-gray-200"
-              >
-                {editId === client.id ? (
-                  <form onSubmit={handleEditSubmit} className="space-y-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Nom *
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={editForm.name}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-blue-700 text-center">
+            Liste des clients
+          </h2>
+          {error && (
+            <div className="mb-4 text-red-600 text-center font-semibold">
+              {error}
+            </div>
+          )}
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="animate-pulse text-blue-600 font-bold">
+                Chargement...
+              </span>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {clients.map((client) => (
+                <li
+                  key={client.id}
+                  className="bg-white shadow rounded-xl p-8 border border-gray-200 flex flex-col gap-6"
+                >
+                  {editId === client.id ? (
+                    <form
+                      onSubmit={handleEditSubmit}
+                      className="flex-1 space-y-2"
+                    >
+                      <input
+                        type="text"
+                        name="name"
+                        value={editForm.name}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded w-full mb-1 text-black"
+                        placeholder="Nom"
+                      />
+                      <input
+                        type="text"
+                        name="address"
+                        value={editForm.address}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 p-2 rounded w-full mb-1 text-black"
+                        placeholder="Adresse"
+                      />
+                      <input
+                        type="text"
+                        name="phone"
+                        value={editForm.phone}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 p-2 rounded w-full mb-1 text-black"
+                        placeholder="Téléphone"
+                      />
+                      <input
+                        type="email"
+                        name="email"
+                        value={editForm.email}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 p-2 rounded w-full mb-1 text-black"
+                        placeholder="Email"
+                      />
+                      <div className="flex gap-4 w-full justify-center mt-4">
+                        <button
+                          type="submit"
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        >
+                          Valider
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        >
+                          Annuler
+                        </button>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Adresse
-                        </label>
-                        <input
-                          type="text"
-                          name="address"
-                          value={editForm.address}
-                          onChange={handleEditChange}
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
+                    </form>
+                  ) : (
+                    <>
+                      <div className="flex-1">
+                        <span className="font-bold text-blue-700 block text-lg mb-1">
+                          {client.name}
+                        </span>
+                        <div className="text-gray-600 text-sm mb-1">
+                          {client.address}
+                        </div>
+                        <div className="text-gray-600 text-sm mb-1">
+                          {client.phone}
+                        </div>
+                        <div className="text-gray-600 text-sm mb-1">
+                          {client.email}
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Téléphone
-                        </label>
-                        <input
-                          type="text"
-                          name="phone"
-                          value={editForm.phone}
-                          onChange={handleEditChange}
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
+                      <div className="flex gap-2 mt-2 md:mt-0">
+                        <div className="flex gap-4 w-full justify-center mt-4">
+                          <button
+                            onClick={() => startEdit(client)}
+                            className="bg-blue-400 hover:bg-blue-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                          >
+                            Modifier
+                          </button>
+                          <button
+                            onClick={() => deleteClient(client.id)}
+                            className="bg-red-600 hover:bg-red-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={editForm.email}
-                          onChange={handleEditChange}
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
-                      >
-                        Valider
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEdit}
-                        className="bg-gray-400 hover:bg-gray-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
-                      >
-                        Annuler
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <span className="text-lg font-bold text-blue-700">
-                        {client.name}
-                      </span>
-                      <div className="text-gray-600 text-sm">
-                        {client.address && (
-                          <span>
-                            {client.address} <br />
-                          </span>
-                        )}
-                        {client.phone && (
-                          <span>
-                            {client.phone} <br />
-                          </span>
-                        )}
-                        {client.email && <span>{client.email}</span>}
-                      </div>
-                    </div>
-                    <div className="mt-2 md:mt-0 flex gap-2">
-                      <button
-                        onClick={() => startEdit(client)}
-                        className="bg-yellow-400 hover:bg-yellow-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => deleteClient(client.id)}
-                        className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

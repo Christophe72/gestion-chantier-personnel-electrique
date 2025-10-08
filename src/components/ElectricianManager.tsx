@@ -18,7 +18,7 @@ export function useElectricians() {
       const res = await fetch("/api/electricians");
       const data = await res.json();
       setElectricians(data);
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la récupération des électriciens");
     } finally {
       setLoading(false);
@@ -43,7 +43,7 @@ export function useElectricians() {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de l'ajout");
     }
   };
@@ -62,7 +62,7 @@ export function useElectricians() {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la modification");
     }
   };
@@ -81,7 +81,7 @@ export function useElectricians() {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
       }
-    } catch (e) {
+    } catch {
       setError("Erreur lors de la suppression");
     }
   };
@@ -107,7 +107,9 @@ export default function ElectricianManager() {
   } = useElectricians();
   const [form, setForm] = useState<Omit<Electrician, "id">>({ name: "" });
   const [editId, setEditId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<Omit<Electrician, "id">>(form);
+  const [editForm, setEditForm] = useState<Omit<Electrician, "id">>({
+    name: "",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -125,7 +127,7 @@ export default function ElectricianManager() {
 
   const startEdit = (electrician: Electrician) => {
     setEditId(electrician.id);
-    setEditForm({ name: electrician.name || "" });
+    setEditForm({ name: electrician.name });
   };
 
   const handleEditSubmit = (e: React.FormEvent) => {
@@ -133,11 +135,13 @@ export default function ElectricianManager() {
     if (editId) {
       updateElectrician({ id: editId, ...editForm });
       setEditId(null);
+      setEditForm({ name: "" });
     }
   };
 
   const cancelEdit = () => {
     setEditId(null);
+    setEditForm({ name: "" });
   };
 
   return (
@@ -174,14 +178,14 @@ export default function ElectricianManager() {
           Factures
         </Link>
       </nav>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center drop-shadow">
-          Gestion des électriciens
-        </h2>
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <form
           onSubmit={handleSubmit}
-          className="mb-10 bg-white shadow-lg rounded-xl p-6 space-y-4"
+          className="bg-white shadow-lg rounded-xl p-6 space-y-4"
         >
+          <h2 className="text-2xl font-bold mb-4 text-yellow-700 text-center">
+            Ajouter un électricien
+          </h2>
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-700">
               Nom *
@@ -193,50 +197,51 @@ export default function ElectricianManager() {
               value={form.name}
               onChange={handleChange}
               required
-              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-yellow-400 text-black"
             />
           </div>
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
+            className="bg-yellow-600 hover:bg-yellow-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
           >
             Ajouter
           </button>
         </form>
-        {error && (
-          <div className="mb-4 text-red-600 text-center font-semibold">
-            {error}
-          </div>
-        )}
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <span className="animate-pulse text-blue-600 font-bold">
-              Chargement...
-            </span>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            {electricians.map((electrician) => (
-              <li
-                key={electrician.id}
-                className="bg-white shadow rounded-xl p-4 border border-gray-200"
-              >
-                {editId === electrician.id ? (
-                  <form onSubmit={handleEditSubmit} className="space-y-2">
-                    <div>
-                      <label className="block text-sm font-medium mb-1 text-gray-700">
-                        Nom *
-                      </label>
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-yellow-700 text-center">
+            Liste des électriciens
+          </h2>
+          {error && (
+            <div className="mb-4 text-red-600 text-center font-semibold">
+              {error}
+            </div>
+          )}
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="animate-pulse text-yellow-600 font-bold">
+                Chargement...
+              </span>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {electricians.map((electrician) => (
+                <li
+                  key={electrician.id}
+                  className="bg-white shadow rounded-xl p-4 border border-gray-200 flex justify-between items-center"
+                >
+                  {editId === electrician.id ? (
+                    <form
+                      onSubmit={handleEditSubmit}
+                      className="flex gap-2 items-center"
+                    >
                       <input
                         type="text"
                         name="name"
                         value={editForm.name}
                         onChange={handleEditChange}
                         required
-                        className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-yellow-400 text-black"
                       />
-                    </div>
-                    <div className="flex gap-2 mt-2">
                       <button
                         type="submit"
                         className="bg-green-600 hover:bg-green-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
@@ -250,33 +255,33 @@ export default function ElectricianManager() {
                       >
                         Annuler
                       </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <span className="text-lg font-bold text-blue-700">
-                      {electrician.name}
-                    </span>
-                    <div className="mt-2 md:mt-0 flex gap-2">
-                      <button
-                        onClick={() => startEdit(electrician)}
-                        className="bg-yellow-400 hover:bg-yellow-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => deleteElectrician(electrician.id)}
-                        className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+                    </form>
+                  ) : (
+                    <>
+                      <span className="font-bold text-yellow-700">
+                        {electrician.name}
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => startEdit(electrician)}
+                          className="bg-yellow-400 hover:bg-yellow-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => deleteElectrician(electrician.id)}
+                          className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

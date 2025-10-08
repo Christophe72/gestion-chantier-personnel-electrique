@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useInterventions } from "./InterventionManager";
+import InvoiceAlert from "./InvoiceAlert";
 import Link from "next/link";
 
 interface Invoice {
@@ -34,7 +35,10 @@ const useInvoices = () => {
     fetchInvoices();
   }, []);
 
-  const addInvoice = async (invoice: Omit<Invoice, "id">) => {
+  const addInvoice = async (
+    invoice: Omit<Invoice, "id">,
+    onSuccess?: () => void
+  ) => {
     setError("");
     try {
       const res = await fetch("/api/invoices", {
@@ -43,7 +47,9 @@ const useInvoices = () => {
         body: JSON.stringify(invoice),
       });
       if (res.ok) {
-        fetchInvoices();
+        await fetchInvoices();
+        if (onSuccess) onSuccess();
+        window.location.reload();
       } else {
         const err = await res.json();
         setError(err.message || "Erreur lors de l'ajout");
@@ -53,7 +59,7 @@ const useInvoices = () => {
     }
   };
 
-  const updateInvoice = async (invoice: Invoice) => {
+  const updateInvoice = async (invoice: Invoice, onSuccess?: () => void) => {
     setError("");
     try {
       const res = await fetch("/api/invoices", {
@@ -62,7 +68,9 @@ const useInvoices = () => {
         body: JSON.stringify(invoice),
       });
       if (res.ok) {
-        fetchInvoices();
+        await fetchInvoices();
+        if (onSuccess) onSuccess();
+        window.location.reload();
       } else {
         const err = await res.json();
         setError(err.message || "Erreur lors de la modification");
@@ -72,7 +80,7 @@ const useInvoices = () => {
     }
   };
 
-  const deleteInvoice = async (id: number) => {
+  const deleteInvoice = async (id: number, onSuccess?: () => void) => {
     setError("");
     try {
       const res = await fetch("/api/invoices", {
@@ -81,7 +89,9 @@ const useInvoices = () => {
         body: JSON.stringify({ id }),
       });
       if (res.ok) {
-        fetchInvoices();
+        await fetchInvoices();
+        if (onSuccess) onSuccess();
+        window.location.reload();
       } else {
         const err = await res.json();
         setError(err.message || "Erreur lors de la suppression");
@@ -121,7 +131,6 @@ export default function InvoiceManager() {
   };
 
   const toISODate = (date: string) => {
-    // Si la date est déjà au format ISO, on la garde, sinon on la convertit
     if (!date) return "";
     if (date.length > 10) return date;
     return new Date(date).toISOString();
@@ -168,11 +177,13 @@ export default function InvoiceManager() {
         interventionId: Number(editForm.interventionId),
       });
       setEditId(null);
+      setEditForm(form);
     }
   };
 
   const cancelEdit = () => {
     setEditId(null);
+    setEditForm(form);
   };
 
   return (
@@ -209,267 +220,238 @@ export default function InvoiceManager() {
           Factures
         </Link>
       </nav>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center drop-shadow">
-          Gestion des factures
-        </h2>
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <form
           onSubmit={handleSubmit}
-          className="mb-10 bg-white shadow-lg rounded-xl p-6 space-y-4"
+          className="bg-white shadow-lg rounded-xl p-6 space-y-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Montant *
-              </label>
-              <input
-                type="number"
-                name="amount"
-                placeholder="Montant"
-                value={form.amount}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Date émission *
-              </label>
-              <input
-                type="date"
-                name="issueDate"
-                placeholder="Date émission"
-                value={form.issueDate}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Date échéance *
-              </label>
-              <input
-                type="date"
-                name="dueDate"
-                placeholder="Date échéance"
-                value={form.dueDate}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Statut
-              </label>
-              <select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              >
-                <option value="Brouillon">Brouillon</option>
-                <option value="Envoyée">Envoyée</option>
-                <option value="Payée">Payée</option>
-                <option value="En retard">En retard</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Intervention liée *
-              </label>
-              <select
-                name="interventionId"
-                value={form.interventionId}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              >
-                {interventions.length === 0 && (
-                  <option value="" disabled>
-                    Aucune intervention disponible
-                  </option>
-                )}
-                {interventions.map((intervention) => (
-                  <option key={intervention.id} value={intervention.id}>
-                    {intervention.title} (ID {intervention.id})
-                  </option>
-                ))}
-              </select>
-            </div>
+          <h2 className="text-2xl font-bold mb-4 text-purple-700 text-center">
+            Ajouter une facture
+          </h2>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Montant *
+            </label>
+            <input
+              type="number"
+              name="amount"
+              placeholder="Montant"
+              value={form.amount}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-purple-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Date émission *
+            </label>
+            <input
+              type="date"
+              name="issueDate"
+              placeholder="Date émission"
+              value={form.issueDate}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-purple-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Date échéance *
+            </label>
+            <input
+              type="date"
+              name="dueDate"
+              placeholder="Date échéance"
+              value={form.dueDate}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-purple-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Statut
+            </label>
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-purple-400 text-black"
+            >
+              <option value="Brouillon">Brouillon</option>
+              <option value="Envoyée">Envoyée</option>
+              <option value="Payée">Payée</option>
+              <option value="En retard">En retard</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Intervention liée *
+            </label>
+            <select
+              name="interventionId"
+              value={form.interventionId}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-purple-400 text-black"
+            >
+              {interventions.length === 0 && (
+                <option value="" disabled>
+                  Aucune intervention disponible
+                </option>
+              )}
+              {interventions.map((intervention) => (
+                <option key={intervention.id} value={intervention.id}>
+                  {intervention.title} (ID {intervention.id})
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
+            className="bg-purple-600 hover:bg-purple-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
           >
             Ajouter
           </button>
         </form>
-        {error && (
-          <div className="mb-4 text-red-600 text-center font-semibold">
-            {error}
-          </div>
-        )}
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <span className="animate-pulse text-blue-600 font-bold">
-              Chargement...
-            </span>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            {invoices.map((invoice) => (
-              <li
-                key={invoice.id}
-                className="bg-white shadow rounded-xl p-4 border border-gray-200"
-              >
-                {editId === invoice.id ? (
-                  <form onSubmit={handleEditSubmit} className="space-y-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Montant *
-                        </label>
-                        <input
-                          type="number"
-                          name="amount"
-                          value={editForm.amount}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Date émission *
-                        </label>
-                        <input
-                          type="date"
-                          name="issueDate"
-                          value={editForm.issueDate}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Date échéance *
-                        </label>
-                        <input
-                          type="date"
-                          name="dueDate"
-                          value={editForm.dueDate}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Statut
-                        </label>
-                        <select
-                          name="status"
-                          value={editForm.status}
-                          onChange={handleEditChange}
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        >
-                          <option value="Brouillon">Brouillon</option>
-                          <option value="Envoyée">Envoyée</option>
-                          <option value="Payée">Payée</option>
-                          <option value="En retard">En retard</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Intervention liée *
-                        </label>
-                        <select
-                          name="interventionId"
-                          value={editForm.interventionId}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        >
-                          {interventions.length === 0 && (
-                            <option value="" disabled>
-                              Aucune intervention disponible
-                            </option>
-                          )}
-                          {interventions.map((intervention) => (
-                            <option
-                              key={intervention.id}
-                              value={intervention.id}
-                            >
-                              {intervention.title} (ID {intervention.id})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-purple-700 text-center">
+            Liste des factures
+          </h2>
+          {error && (
+            <div className="mb-4 text-red-600 text-center font-semibold">
+              {error}
+            </div>
+          )}
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="animate-pulse text-purple-600 font-bold">
+                Chargement...
+              </span>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {invoices.map((invoice) => (
+                <li
+                  key={invoice.id}
+                  className="bg-white shadow rounded-xl p-4 border border-gray-200 flex flex-col gap-2"
+                >
+                  {editId === invoice.id ? (
+                    <form
+                      onSubmit={handleEditSubmit}
+                      className="flex flex-col gap-2"
+                    >
+                      <input
+                        type="number"
+                        name="amount"
+                        value={editForm.amount}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-purple-400 text-black"
+                      />
+                      <input
+                        type="date"
+                        name="issueDate"
+                        value={editForm.issueDate}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-purple-400 text-black"
+                      />
+                      <input
+                        type="date"
+                        name="dueDate"
+                        value={editForm.dueDate}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-purple-400 text-black"
+                      />
+                      <select
+                        name="status"
+                        value={editForm.status}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-purple-400 text-black"
                       >
-                        Valider
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEdit}
-                        className="bg-gray-400 hover:bg-gray-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        <option value="Brouillon">Brouillon</option>
+                        <option value="Envoyée">Envoyée</option>
+                        <option value="Payée">Payée</option>
+                        <option value="En retard">En retard</option>
+                      </select>
+                      <select
+                        name="interventionId"
+                        value={editForm.interventionId}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-purple-400 text-black"
                       >
-                        Annuler
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <span className="text-lg font-bold text-blue-700">
+                        {interventions.length === 0 && (
+                          <option value="" disabled>
+                            Aucune intervention disponible
+                          </option>
+                        )}
+                        {interventions.map((intervention) => (
+                          <option key={intervention.id} value={intervention.id}>
+                            {intervention.title} (ID {intervention.id})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="submit"
+                          className="bg-purple-600 hover:bg-purple-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        >
+                          Valider
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="bg-gray-400 hover:bg-gray-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <span className="font-bold text-purple-700">
                         Montant : {invoice.amount} €
                       </span>
-                      <div className="text-gray-600 text-sm mt-1">
-                        <span>
-                          Émise le :{" "}
-                          {new Date(invoice.issueDate).toLocaleDateString()}
-                          <br />
-                        </span>
-                        <span>
-                          Échéance :{" "}
-                          {new Date(invoice.dueDate).toLocaleDateString()}
-                          <br />
-                        </span>
-                        <span>
-                          Statut : {invoice.status}
-                          <br />
-                        </span>
-                        <span>ID intervention : {invoice.interventionId}</span>
+                      <span className="text-gray-600 text-sm">
+                        Émise le :{" "}
+                        {new Date(invoice.issueDate).toLocaleDateString()}
+                      </span>
+                      <span className="text-gray-600 text-sm">
+                        Échéance :{" "}
+                        {new Date(invoice.dueDate).toLocaleDateString()}
+                      </span>
+                      <span className="text-gray-600 text-sm">
+                        Statut : {invoice.status}
+                      </span>
+                      <span className="text-gray-600 text-sm">
+                        Intervention ID : {invoice.interventionId}
+                      </span>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={() => startEdit(invoice)}
+                          className="bg-purple-400 hover:bg-purple-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => deleteInvoice(invoice.id)}
+                          className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                        >
+                          Supprimer
+                        </button>
                       </div>
-                    </div>
-                    <div className="mt-2 md:mt-0 flex gap-2">
-                      <button
-                        onClick={() => startEdit(invoice)}
-                        className="bg-yellow-400 hover:bg-yellow-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => deleteInvoice(invoice.id)}
-                        className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

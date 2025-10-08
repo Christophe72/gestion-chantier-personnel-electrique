@@ -37,9 +37,17 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
+    // Correction préventive du format de date
+    const updateData = { ...body };
+    if (updateData.createdAt && updateData.createdAt.length === 10) {
+      updateData.createdAt = new Date(updateData.createdAt).toISOString();
+    }
+    if (updateData.updatedAt && updateData.updatedAt.length === 10) {
+      updateData.updatedAt = new Date(updateData.updatedAt).toISOString();
+    }
     const client = await prisma.client.update({
       where: { id: body.id },
-      data: body,
+      data: updateData,
     });
     return Response.json(client);
   } catch (error) {

@@ -118,8 +118,8 @@ export default function InterventionManager() {
     description: "",
     date: "",
     status: "Planifiée",
-    clientId: clients.length > 0 ? clients[0].id : 0,
-    electricianId: electricians.length > 0 ? electricians[0].id : 0,
+    clientId: 0,
+    electricianId: 0,
   });
   const [editId, setEditId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Omit<Intervention, "id">>(form);
@@ -136,17 +136,10 @@ export default function InterventionManager() {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  const toISODate = (date: string) => {
-    if (!date) return "";
-    if (date.length > 10) return date;
-    return new Date(date).toISOString();
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addIntervention({
       ...form,
-      date: toISODate(form.date),
       clientId: Number(form.clientId),
       electricianId: Number(form.electricianId),
     });
@@ -178,16 +171,17 @@ export default function InterventionManager() {
       updateIntervention({
         id: editId,
         ...editForm,
-        date: toISODate(editForm.date),
         clientId: Number(editForm.clientId),
         electricianId: Number(editForm.electricianId),
       });
       setEditId(null);
+      setEditForm(form);
     }
   };
 
   const cancelEdit = () => {
     setEditId(null);
+    setEditForm(form);
   };
 
   return (
@@ -224,299 +218,276 @@ export default function InterventionManager() {
           Factures
         </Link>
       </nav>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 text-center drop-shadow">
-          Gestion des interventions
-        </h2>
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <form
           onSubmit={handleSubmit}
-          className="mb-10 bg-white shadow-lg rounded-xl p-6 space-y-4"
+          className="bg-white shadow-lg rounded-xl p-6 space-y-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Titre *
-              </label>
-              <input
-                type="text"
-                name="title"
-                placeholder="Titre"
-                value={form.title}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Description
-              </label>
-              <input
-                type="text"
-                name="description"
-                placeholder="Description"
-                value={form.description}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Date *
-              </label>
-              <input
-                type="date"
-                name="date"
-                placeholder="Date"
-                value={form.date}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Statut
-              </label>
-              <select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              >
-                <option value="Planifiée">Planifiée</option>
-                <option value="En cours">En cours</option>
-                <option value="Terminée">Terminée</option>
-                <option value="Facturée">Facturée</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Client
-              </label>
-              <select
-                name="clientId"
-                value={form.clientId}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              >
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Électricien
-              </label>
-              <select
-                name="electricianId"
-                value={form.electricianId}
-                onChange={handleChange}
-                required
-                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400 text-black"
-              >
-                {electricians.map((electrician) => (
-                  <option key={electrician.id} value={electrician.id}>
-                    {electrician.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <h2 className="text-2xl font-bold mb-4 text-green-700 text-center">
+            Ajouter une intervention
+          </h2>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Titre *
+            </label>
+            <input
+              type="text"
+              name="title"
+              placeholder="Titre"
+              value={form.title}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Description
+            </label>
+            <input
+              type="text"
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Date *
+            </label>
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Statut
+            </label>
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+            >
+              <option value="Planifiée">Planifiée</option>
+              <option value="En cours">En cours</option>
+              <option value="Terminée">Terminée</option>
+              <option value="En retard">En retard</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Client *
+            </label>
+            <select
+              name="clientId"
+              value={form.clientId}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+            >
+              {clients.length === 0 && (
+                <option value="" disabled>
+                  Aucun client disponible
+                </option>
+              )}
+              {clients.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name} (ID {client.id})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              Électricien *
+            </label>
+            <select
+              name="electricianId"
+              value={form.electricianId}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
+            >
+              {electricians.length === 0 && (
+                <option value="" disabled>
+                  Aucun électricien disponible
+                </option>
+              )}
+              {electricians.map((electrician) => (
+                <option key={electrician.id} value={electrician.id}>
+                  {electrician.name} (ID {electrician.id})
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
+            className="bg-green-600 hover:bg-green-700 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
           >
             Ajouter
           </button>
         </form>
-        {error && (
-          <div className="mb-4 text-red-600 text-center font-semibold">
-            {error}
-          </div>
-        )}
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <span className="animate-pulse text-blue-600 font-bold">
-              Chargement...
-            </span>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            {interventions.map((intervention) => (
-              <li
-                key={intervention.id}
-                className="bg-white shadow rounded-xl p-4 border border-gray-200"
-              >
-                {editId === intervention.id ? (
-                  <form onSubmit={handleEditSubmit} className="space-y-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Titre *
-                        </label>
-                        <input
-                          type="text"
-                          name="title"
-                          value={editForm.title}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Description
-                        </label>
-                        <input
-                          type="text"
-                          name="description"
-                          value={editForm.description}
-                          onChange={handleEditChange}
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Date *
-                        </label>
-                        <input
-                          type="date"
-                          name="date"
-                          value={editForm.date}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Statut
-                        </label>
-                        <select
-                          name="status"
-                          value={editForm.status}
-                          onChange={handleEditChange}
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400 text-black"
-                        >
-                          <option value="Planifiée">Planifiée</option>
-                          <option value="En cours">En cours</option>
-                          <option value="Terminée">Terminée</option>
-                          <option value="Facturée">Facturée</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Client
-                        </label>
-                        <select
-                          name="clientId"
-                          value={editForm.clientId}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400"
-                        >
-                          {clients.map((client) => (
-                            <option key={client.id} value={client.id}>
-                              {client.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Électricien
-                        </label>
-                        <select
-                          name="electricianId"
-                          value={editForm.electricianId}
-                          onChange={handleEditChange}
-                          required
-                          className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-green-400"
-                        >
-                          {electricians.map((electrician) => (
-                            <option key={electrician.id} value={electrician.id}>
-                              {electrician.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-green-700 text-center">
+            Liste des interventions
+          </h2>
+          {error && (
+            <div className="mb-4 text-red-600 text-center font-semibold">
+              {error}
+            </div>
+          )}
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="animate-pulse text-green-600 font-bold">
+                Chargement...
+              </span>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {interventions.map((intervention) => (
+                <li
+                  key={intervention.id}
+                  className="bg-white shadow rounded-xl p-4 border border-gray-200 flex flex-col gap-2"
+                >
+                  {editId === intervention.id ? (
+                    <form
+                      onSubmit={handleEditSubmit}
+                      className="flex flex-col gap-2"
+                    >
+                      <input
+                        type="text"
+                        name="title"
+                        value={editForm.title}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400 text-black"
+                      />
+                      <input
+                        type="text"
+                        name="description"
+                        value={editForm.description}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400 text-black"
+                      />
+                      <input
+                        type="date"
+                        name="date"
+                        value={editForm.date}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400 text-black"
+                      />
+                      <select
+                        name="status"
+                        value={editForm.status}
+                        onChange={handleEditChange}
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400 text-black"
                       >
-                        Valider
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEdit}
-                        className="bg-gray-400 hover:bg-gray-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        <option value="Planifiée">Planifiée</option>
+                        <option value="En cours">En cours</option>
+                        <option value="Terminée">Terminée</option>
+                        <option value="En retard">En retard</option>
+                      </select>
+                      <select
+                        name="clientId"
+                        value={editForm.clientId}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400 text-black"
                       >
-                        Annuler
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <span className="text-lg font-bold text-blue-700">
+                        {clients.length === 0 && (
+                          <option value="" disabled>
+                            Aucun client disponible
+                          </option>
+                        )}
+                        {clients.map((client) => (
+                          <option key={client.id} value={client.id}>
+                            {client.name} (ID {client.id})
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        name="electricianId"
+                        value={editForm.electricianId}
+                        onChange={handleEditChange}
+                        required
+                        className="border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400 text-black"
+                      >
+                        {electricians.length === 0 && (
+                          <option value="" disabled>
+                            Aucun électricien disponible
+                          </option>
+                        )}
+                        {electricians.map((electrician) => (
+                          <option key={electrician.id} value={electrician.id}>
+                            {electrician.name} (ID {electrician.id})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="submit"
+                          className="bg-green-600 hover:bg-green-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        >
+                          Valider
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="bg-gray-400 hover:bg-gray-500 transition text-white px-4 py-2 rounded-lg font-semibold shadow"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <span className="font-bold text-green-700">
                         {intervention.title}
                       </span>
-                      <span className="ml-2 text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">
-                        {intervention.status}
+                      <span className="text-gray-600 text-sm">
+                        {intervention.description}
                       </span>
-                      <div className="text-gray-600 text-sm mt-1">
-                        {intervention.description && (
-                          <span>
-                            {intervention.description}
-                            <br />
-                          </span>
-                        )}
-                        <span>
-                          Date :{" "}
-                          {new Date(intervention.date).toLocaleDateString()}
-                          <br />
-                        </span>
-                        <span>
-                          Client :{" "}
-                          {clients.find((c) => c.id === intervention.clientId)
-                            ?.name || intervention.clientId}
-                          <br />
-                        </span>
-                        <span>
-                          Électricien :{" "}
-                          {electricians.find(
-                            (e) => e.id === intervention.electricianId
-                          )?.name || intervention.electricianId}
-                        </span>
+                      <span className="text-gray-600 text-sm">
+                        Date :{" "}
+                        {new Date(intervention.date).toLocaleDateString()}
+                      </span>
+                      <span className="text-gray-600 text-sm">
+                        Statut : {intervention.status}
+                      </span>
+                      <span className="text-gray-600 text-sm">
+                        Client ID : {intervention.clientId} | Électricien ID :{" "}
+                        {intervention.electricianId}
+                      </span>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={() => startEdit(intervention)}
+                          className="bg-green-400 hover:bg-green-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => deleteIntervention(intervention.id)}
+                          className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
+                        >
+                          Supprimer
+                        </button>
                       </div>
-                    </div>
-                    <div className="mt-2 md:mt-0 flex gap-2">
-                      <button
-                        onClick={() => startEdit(intervention)}
-                        className="bg-yellow-400 hover:bg-yellow-500 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => deleteIntervention(intervention.id)}
-                        className="bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded-lg font-semibold shadow"
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
